@@ -348,21 +348,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+                  //SHELLL
     private String convertUriToBase64(Uri uri) {
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             if (inputStream == null) return "";
 
+            // 1. ตรวจสอบขนาดไฟล์เบื้องต้น
+            int fileSizeInBytes = inputStream.available();
+            double fileSizeInMB = fileSizeInBytes / (1024.0 * 1024.0);
+
+            // 2. อ่านเฉพาะขนาดของรูปภาพ (width/height)
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeStream(inputStream, null, options);
             inputStream.close();
 
+            // 🟢 3. ส่วนคำนวณ inSampleSize (ต้องมีส่วนนี้เพื่อไม่ให้ขึ้นสีแดง)
             int targetSize = 400;
             int width = options.outWidth;
             int height = options.outHeight;
-            int inSampleSize = 1;
+            int inSampleSize = 1; // <--- ประกาศตัวแปรตรงนี้
 
             if (width > targetSize || height > targetSize) {
                 final int halfWidth = width / 2;
@@ -372,9 +378,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            // 4. โหลดรูปภาพจริงโดยใช้ inSampleSize ที่คำนวณได้
             inputStream = getContentResolver().openInputStream(uri);
             options.inJustDecodeBounds = false;
-            options.inSampleSize = inSampleSize;
+            options.inSampleSize = inSampleSize; // <--- ตัวแปรนี้จะหายแดงทันที
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
             inputStream.close();
 
@@ -511,6 +518,8 @@ public class MainActivity extends AppCompatActivity {
         if (tvDetailInstagram != null) tvDetailInstagram.setText("Instagram: " + product.getSellerInstagram());
         if (tvDetailPhone != null) tvDetailPhone.setText("โทร: " + product.getSellerPhone());
 
+
+          // SHEL
         // =========================================================================
         // 🟢 [แก้ไขตรงนี้]: กำหนดให้พื้นหลังรอบรูปภาพเป็น "สีขาว" และแสดงภาพครบถ้วน 100%
         // =========================================================================
